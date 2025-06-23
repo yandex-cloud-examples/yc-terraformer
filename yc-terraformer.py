@@ -108,7 +108,7 @@ def format_value(value):
         logging.debug (f"format_value: format upper2lower value: {value}")
         return str(value).lower()
     elif value is None:
-        logging.debug (f"format_value: replace Value None to ''")
+        logging.debug ("format_value: replace Value None to ''")
         return '""'
     return json.dumps(value)
 
@@ -135,7 +135,7 @@ def remove_keys(json_data, target_key, keys2remove):
         keys2remove (dict): словарь ключей, которые нужно удалить
     """
     if not target_key:  # Если список ключей пуст, удаляем из корня.
-        logging.debug(f"remove_keys: is root of JSON")
+        logging.debug("remove_keys: is root of JSON")
         for key in list(json_data.keys()):
             logging.debug(f"remove_keys: check {key} in root!")
             if key in keys2remove:
@@ -177,7 +177,7 @@ def add_keys(json_data, target_key, keys2add):
         keys2add (list): словарь ключей и значений, которые нужно добавить {new_key: new_value}
     """
     if not target_key:  # Если target_key None, добавляем в корень.
-        logging.debug(f"add_keys: is root of JSON")
+        logging.debug("add_keys: is root of JSON")
         if isinstance(json_data, dict):
             logging.debug(f"add_keys: data is dict: {json_data}")
             json_data.update(keys2add)
@@ -282,13 +282,6 @@ def convert_to_terraform(json_data,keys2remove,keys2add,keys2include):
             terraform_code += f'resource "{type_}" "{name}" {{\n'
             logging.debug(f"convert_to_terraform: keys2remove from root: {keys2remove.get('root','')}")
             remove_keys(attributes, '', keys2remove.get('root',''))
-            ### Этот баг чинят, когда исправят надо удалить
-            if 'mdb' in type_:
-                if isinstance(attributes.get('maintenance_window',''), list):
-                    for elem in attributes.get('maintenance_window',''):
-                        if elem.get('type','') == "ANYTIME":
-                            logging.debug(f"convert_to_terraform: MDB maintenance_window remove hour: {attributes.get('maintenance_window','')}")
-                            remove_keys(attributes,'maintenance_window',['hour'])
             if type_ in keys2remove.keys():
                 logging.debug(f"convert_to_terraform: {type_}: keys2remove: {keys2remove.get(type_).items()}")
                 for block_,key_ in keys2remove.get(type_).items():
@@ -324,8 +317,9 @@ def get_alb_target_group_ids(json_data):
             backends = json_data.get(key, '').get('backends', '')
             for backend in backends:
                 logging.debug(f"get_alb_target_group_ids: check for backend: {backend}")
-                if 'target_groups' in backend and 'target_group_ids' in backend.get('target_groups', ''):
-                    target_group_ids.extend(backend.get('target_groups', '').get('target_group_ids', ''))
+                target_groups = backend.get('targetGroups')
+                if isinstance(target_groups, dict) and 'targetGroupIds' in target_groups:
+                    target_group_ids.extend(target_groups.get('targetGroupIds', []))
                     logging.debug(f"get_alb_target_group_ids: Find target_group_ids {target_group_ids} in backend: {backend}")
     return target_group_ids
 
@@ -345,9 +339,10 @@ def get_alb_backend_group(backend_group_id):
     logging.debug(f"get_alb_backend_group: {backend_group_json.get('name', '')}")
     resource_name_list += resource_tfstate_import("backend_group",backend_group_json.get('id', ''),backend_group_json.get('name', ''))
     target_group_ids=get_alb_target_group_ids(backend_group_json)
-    logging.debug("get_alb_backend_group: target_groups_import")
+    logging.debug(f"get_alb_backend_group: target_groups_import: {target_group_ids}")
     for target_group_id in target_group_ids:
         target_group_json = get_json_api_url(access_token, target_group_id, service, 'targetGroup', '')
+        logging.debug(f"get_alb_backend_group: import target_group: {target_group_json.get('name', '')}")
         resource_name_list += resource_tfstate_import("target_group",target_group_id,target_group_json.get('name', ''))
     return resource_name_list
 
@@ -381,7 +376,7 @@ def get_endpoint_api(service):
         logging.error(f"An error occurred: {err}")
         raise
     except json.JSONDecodeError as e:
-        logging.error(f"Ошибка декодирования JSON {e}")
+        logging.error(f"Error decoding JSON {e}")
         raise
     except KeyError as e:
         logging.error(f"Key error in parsing JSON response: {e}")
@@ -425,26 +420,26 @@ def get_json_api_url(access_token, id, service, subitem_type, uri):
     except requests.RequestException as err:
         logging.error(f"An error occurred: {err}")
     except json.JSONDecodeError as e:
-        logging.error(f"Ошибка декодирования JSON {e}")
+        logging.error(f"Error decoding JSON {e}")
     except KeyError as e:
         logging.error(f"Key error in parsing JSON response: {e}")
         raise
 
 def main():
 
-    parser = argparse.ArgumentParser(description="Ссылка на полную документацию: https://wiki.yandex-team.ru/users/silmushkin/notes/terraform-import/\n"
-                                        "Программа принимает на вход следующие значения:\n", formatter_class=argparse.RawTextHelpFormatter)
+    parser = argparse.ArgumentParser(description="URL for full documentation: https://github.com/yandex-cloud-examples/yc-terraformer/\n"
+                                        "The program takes the following values as input:\n", formatter_class=argparse.RawTextHelpFormatter)
     # флаги
-    parser.add_argument('--import-metadata', action='store_true', help='Импорт ресурсов c блоком metadata')
-    parser.add_argument('--import-ids', action='store_true', help='Импорт ресурсов c текущими id в конфигурации')
-    parser.add_argument('--with-state',action='store_true', help='Сохранение текущей конфигураци ресурса в terraform state')
-    parser.add_argument('--debug',action='store_true', help='Включение вывода отладочной информации')
-    parser.add_argument('--recursive', action='store_true', help='Включает рекурсивный импорт связанных ресурсов')
+    parser.add_argument('--import-metadata', action='store_true', help='Importing resources with a metadata block')
+    parser.add_argument('--import-ids', action='store_true', help='Import resources with current ids in configuration')
+    parser.add_argument('--with-state',action='store_true', help='Saving the current resource configuration to terraform state')
+    parser.add_argument('--debug',action='store_true', help='Enabling debug mode')
+    parser.add_argument('--recursive', action='store_true', help='Enables recursive import of linked resources')
     # Обязательные позиционные аргументы
-    parser.add_argument('service', help='Вид импортируемого сервиса')
-    parser.add_argument('subitem_type', help='Тип импортируемого ресурса')
-    parser.add_argument('name', help='Имя импортируемого ресурса')
-    parser.add_argument('id', help='ID импортируемого ресурса')
+    parser.add_argument('service', help='Type of service being imported')
+    parser.add_argument('subitem_type', help='Type of imported resource')
+    parser.add_argument('name', help='Name of the imported resource')
+    parser.add_argument('id', help='ID of the imported resource')
     args = parser.parse_args()
     # объявляем что работаем с глобальными переменными
     global service_tf
@@ -465,8 +460,8 @@ def main():
     format='%(asctime)s - %(levelname)s - %(message)s'
     )
 
-    logging.debug("Включен DEBUG режии")
-    logging.info(f"Переменные: {service}, {subitem_type}, {name}, {id}")
+    logging.debug("DEBUG MODE Enable")
+    logging.info(f"Variables: {service}, {subitem_type}, {name}, {id}")
 
     match service.split("-"):
         case "managed", "kubernetes":
@@ -485,12 +480,12 @@ def main():
     subitem_type = subitem_type.replace('-','_')
     access_token = os.getenv('YC_TOKEN')
     if not access_token:
-        logging.error("Переменная окружения YC_TOKEN не установлена")
+        logging.error("Environment variable YC_TOKEN is not set")
         sys.exit(1)
 
     service_endpoint = get_endpoint_api(service)
     if not service_endpoint:
-        logging.error("Не удалось получить API endpoint для сервиса")
+        logging.error("Failed to get API endpoint for service")
         sys.exit(1)
 
     keys2include = {
@@ -610,7 +605,7 @@ def main():
     logging.info(f"service:{service}")
     #Включаем рекурсивный испорт, если установлен флаг --recursive
     if args.recursive:
-        logging.info(f"Начинаем рекурсивный импорт")
+        logging.info("Recursive import enabled")
         match service_tf:
             # рекурсивный импорт компонентов "mdb_postgresql" | "mdb_clickhouse" | "mdb_mysql" | "mdb_mongodb"
             case "mdb_postgresql" | "mdb_clickhouse" | "mdb_mysql" | "mdb_mongodb":
@@ -721,10 +716,11 @@ def main():
             case "kubernetes":
                 logging.debug(f"Get {service_tf} cluster {id}")
                 if subitem_type == "cluster":
-                    node_groups = get_json_api_url(access_token, id, service, subitem_type, '/nodeGroups')
-                    if node_groups.get('nodeGroups', []):
-                        logging.debug(f"Get {service_tf} cluster {id}: Node Groups list: {node_groups.get('nodeGroups', [])}")
-                        for node_group in node_groups.get('nodeGroups', []):
+                    node_groups_json = get_json_api_url(access_token, id, service, subitem_type, '/nodeGroups')
+                    node_groups = node_groups_json.get('nodeGroups')
+                    if isinstance(node_groups, list):
+                        logging.debug(f"Get {service_tf} cluster {id}: Node Groups list: {node_groups}")
+                        for node_group in node_groups:
                             if 'name' in node_group:
                                 logging.debug(f"Get {service_tf} cluster {id}: Node Group: {node_group}")
                                 resource_name_list += resource_tfstate_import("node_group",node_group.get('id', ''),node_group.get('name', ''))
@@ -734,14 +730,20 @@ def main():
                 if subitem_type == "instance":
                     instance_json = get_json_api_url(access_token, id, service, subitem_type, '')
                     logging.debug(f"Get {service_tf} instance {id}: instance: {instance_json}")
-                    if 'diskId' in instance_json.get('bootDisk', {}):
-                        disk_json = get_json_api_url(access_token, instance_json.get('bootDisk', {}).get('diskId', ''), service, 'disk', '')
+                    instance_bootdisk_json = instance_json.get('bootDisk', {})
+                    if 'diskId' in instance_bootdisk_json:
+                        disk_json = get_json_api_url(access_token, instance_bootdisk_json.get('diskId', ''), service, 'disk', '')
                         logging.debug(f"Get {service_tf} instance {id}: bootDisk:{disk_json}")
                         resource_name_list += resource_tfstate_import("disk",disk_json.get('id', ''),disk_json.get('name', ''))
-                    if instance_json.get('secondaryDisks', []):
-                        logging.debug(f"Get {service_tf} instance {id}: secondaryDisks list :{instance_json.get('secondaryDisks', [])}")
-                        for secondary_disk in instance_json.get('secondaryDisks', []):
-                            disk_json = get_json_api_url(access_token, secondary_disk.get('diskId', ''), service, 'disk', '')
+                    instance_secondarydisk_json = instance_json.get('secondaryDisks')
+                    if isinstance(instance_secondarydisk_json, list):
+                        logging.debug(f"Get {service_tf} instance {id}: secondaryDisks list :{instance_secondarydisk_json}")
+                        for secondary_disk in instance_secondarydisk_json:
+                            disk_id = secondary_disk.get('diskId')
+                            if not disk_id:
+                                logging.warning(f"Skipping secondary disk without diskId: {secondary_disk}")
+                                continue
+                            disk_json = get_json_api_url(access_token, disk_id, service, 'disk', '')
                             logging.debug(f"Get {service_tf} instance {id}: secondaryDisk:{disk_json}")
                             resource_name_list += resource_tfstate_import("disk",disk_json.get('id', ''),disk_json.get('name', ''))
 
@@ -749,13 +751,13 @@ def main():
         with open('terraform.tfstate', 'r') as tfstate:
             json_data = json.load(tfstate)
     except Exception as e:
-        logging.error(f"Ошибка работы с tfstate: {str(e)}")
+        logging.error(f"Error load tfstate: {str(e)}")
         raise
     except json.JSONDecodeError as er:
-        logging.error(f"Ошибка декодирования JSON: {er}")
+        logging.error(f"Error decoding JSON: {er}")
         raise
     except (FileNotFoundError, PermissionError) as e:
-        logging.error(f"Ошибка загрузки файла tfstate: {e}")
+        logging.error(f"Error read file tfstate: {e}")
         raise
 
     for resource_name in resource_name_list:
@@ -776,7 +778,7 @@ def main():
                     logging.debug(state_rm_command)
                 break
 
-    logging.info("Compile manifest success!")
+    logging.info("Terraform manifests creation completed!")
 
 service_tf = ""
 service = ""
