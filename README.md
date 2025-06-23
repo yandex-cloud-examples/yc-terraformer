@@ -26,7 +26,7 @@
       Скрипт получает при запуске сервис, тип, название и id импортируемого ресурса.
    
       <details>
-      <summary>./yc-terraformer.py -h<summary>
+      <summary>./yc-terraformer.py -h</summary>
       
       ```
       usage: yc-terraformer.py [-h] [--import-metadata] [--import-ids] [--with-state] [--debug] [--recursive] service subitem_type name id
