@@ -26,7 +26,7 @@
       Скрипт получает при запуске сервис, тип, название и id импортируемого ресурса.
    
       <details>
-      <summary>./yc-terraformer.py -h</summary>
+      <summary>`./yc-terraformer.py -h`</summary>
       
       ```
       usage: yc-terraformer.py [-h] [--import-metadata] [--import-ids] [--with-state] [--debug] [--recursive] service subitem_type name id
@@ -79,7 +79,7 @@
    
       По умолчанию все значения `ID` заменяются на переменную с аналогичным именем параметра, чтобы случайно не внести изменения в импортируемые ресурсы. Для указания значений переменных, используемых в файле манифеста, нужно создать файл `variables.tf`, в котором их нужно объявить, и файл `terraform.tfvars`, в котором они будут назначены.
    
-      {% cut "`variables.tf`" %}
+      <details><summary>`variables.tf`</summary>
       
       ```
       #=========== main ==============
@@ -135,9 +135,9 @@
       }
       ```
    
-      {% endcut %}
+      </details>
    
-      {% cut "`terraform.tfvars`" %}
+      <details><summary>`terraform.tfvars`</summary>
       
       ```
       cloud_id  = "b1g5q8h52km0rg0tf67a"
@@ -168,7 +168,7 @@
       platform_id = "standard-v3"
       ```
    
-      {% endcut %}
+      </details>
    
       Если вы импортируете ресурсы клиента, используя флаги `--import-metadata`, `--import-ids` или `--with-state`, будьте предельно аккуратны, чтобы случайно не применить изменения на ресурсы клиента после корректировки файла манифеста. Крайне рекомендуется после выполнения необходимых манипуляций удалять файлы манифестов, а также импортированные ресурсы из `terraform state`.
    
@@ -182,7 +182,7 @@
    
 5. ### Список поддерживаемых сервисов и типов ресурсов:
 
-   * {% cut "iam - Yandex Identity and Access Manager resources" %}
+   * <details><summary>iam - Yandex Identity and Access Manager resources</summary>
      
      * role
    
@@ -196,9 +196,9 @@
    
      * user-account
    
-     {% endcut %}
+     </details>
    
-   * {% cut "compute                   Yandex Compute Cloud resources" %}
+   * <details><summary>compute                   Yandex Compute Cloud resources</summary>
      
      * instance
    
@@ -222,9 +222,9 @@
    
      * gpu-cluster
    
-     {% endcut %}
+     </details>
    
-   * {% cut "vpc                        Yandex Virtual Private Cloud resources" %}
+   * <details><summary>vpc                        Yandex Virtual Private Cloud resources</summary>
      
      * network
    
@@ -238,33 +238,33 @@
    
      * gateway
    
-     {% endcut %}
+     </details>
    
-   * {% cut "dns                        Yandex DNS resources" %}
+   * <details><summary>dns                        Yandex DNS resources</summary>
      
      * zone
    
      * bind-file
    
-     {% endcut %}
+     </details>
    
-   * {% cut "managed-kubernetes         Kubernetes clusters" %}
+   * <details><summary>managed-kubernetes         Kubernetes clusters</summary>
      
      * cluster
    
      * node-group
    
-     {% endcut %}
+     </details>
    
-   * {% cut "ydb                        YDB databases" %}
+   * <details><summary>ydb                        YDB databases</summary>
      
      * database\_serverless
    
      * database\_dedicated
    
-     {% endcut %}
+     </details>
    
-   * {% cut "kms                        Yandex Key Management Service resources" %}
+   * <details><summary>kms                        Yandex Key Management Service resources</summary>
      
      * symmetric-key
    
@@ -272,9 +272,9 @@
    
      * asymmetric-signature-key
    
-     {% endcut %}
+     </details>
    
-   * {% cut "cdn                        CDN resources" %}
+   * <details><summary>cdn                        CDN resources</summary>
      
      * resource
    
@@ -282,15 +282,15 @@
    
      * origin
    
-     {% endcut %}
+     </details>
    
-   * {% cut "certificate-manager        Certificate Manager resources" %}
+   * <details><summary>certificate-manager        Certificate Manager resources</summary>
      
      * certificate
    
-     {% endcut %}
+     </details>
    
-   * {% cut "managed-clickhouse         ClickHouse clusters" %}
+   * <details><summary>managed-clickhouse         ClickHouse clusters</summary>
      
      * cluster
    
@@ -298,9 +298,9 @@
    
      * database
    
-     {% endcut %}
+     </details>
    
-   * {% cut "managed-mongodb            MongoDB clusters" %}
+   * <details><summary>managed-mongodb            MongoDB clusters</summary>
      
      {% block %}
      
@@ -312,9 +312,9 @@
    
      {% endblock %}
    
-     {% endcut %}
+     </details>
    
-   * {% cut "managed-mysql              MySQL clusters" %}
+   * <details><summary>managed-mysql              MySQL clusters</summary>
      
      * cluster
    
@@ -322,15 +322,15 @@
    
      * user
    
-     {% endcut %}
+     </details>
    
-   * {% cut "managed-sqlserver          SQLServer clusters" %}
+   * <details><summary>managed-sqlserver          SQLServer clusters</summary>
      
      * cluster
    
-     {% endcut %}
+     </details>
    
-   * {% cut "managed-postgresql         PostgreSQL clusters" %}
+   * <details><summary>managed-postgresql         PostgreSQL clusters</summary>
      
      * cluster
    
@@ -338,21 +338,21 @@
    
      * user
    
-     {% endcut %}
+     </details>
    
-   * {% cut "managed-greenplum          Greenplum clusters" %}
+   * <details><summary>managed-greenplum          Greenplum clusters</summary>
      
      * cluster
    
-     {% endcut %}
+     </details>
    
-   * {% cut "managed-redis              Redis clusters" %}
+   * <details><summary>managed-redis              Redis clusters</summary>
      
      * cluster
    
-     {% endcut %}
+     </details>
    
-   * {% cut "managed-kafka              Apache Kafka clusters, topics, users and connectors" %}
+   * <details><summary>managed-kafka              Apache Kafka clusters, topics, users and connectors</summary>
      
      * cluster
    
@@ -362,9 +362,9 @@
    
      * connector
    
-     {% endcut %}
+     </details>
    
-   * {% cut "container                  Container resources" %}
+   * <details><summary>container                  Container resources</summary>
      
      * registry
    
@@ -378,25 +378,25 @@
    
      * repository\_lifecycle\_policy
    
-     {% endcut %}
+     </details>
    
-   * {% cut "load-balancer              Yandex Load Balancer resources" %}
+   * <details><summary>load-balancer              Yandex Load Balancer resources</summary>
      
      * network-load-balancer
    
      * target-group
    
-     {% endcut %}
+     </details>
    
-   * {% cut "datatransfer               Data Transfer endpoints and transfers" %}
+   * <details><summary>datatransfer               Data Transfer endpoints and transfers</summary>
      
      * transfer
    
      * endpoint
    
-     {% endcut %}
+     </details>
    
-   * {% cut "serverless                 Serverless resources" %}
+   * <details><summary>serverless                 Serverless resources</summary>
      
      * function
    
@@ -410,9 +410,9 @@
    
      * network
    
-     {% endcut %}
+     </details>
    
-   * {% cut "iot                        Yandex IoT Core resources" %}
+   * <details><summary>iot                        Yandex IoT Core resources</summary>
      
      * registry
    
@@ -420,9 +420,9 @@
    
      * device
    
-     {% endcut %}
+     </details>
    
-   * {% cut "dataproc                   data processing clusters" %}
+   * <details><summary>dataproc                   data processing clusters</summary>
      
      * cluster
    
@@ -430,9 +430,9 @@
    
      * job
    
-     {% endcut %}
+     </details>
    
-   * {% cut "application-load-balancer  Yandex Application Load Balancer resources" %}
+   * <details><summary>application-load-balancer  Yandex Application Load Balancer resources</summary>
      
      * load-balancer
    
@@ -444,23 +444,23 @@
    
      * target-group
    
-     {% endcut %}
+     </details>
    
-   * {% cut "logging                    Yandex Cloud Logging" %}
+   * <details><summary>logging                    Yandex Cloud Logging</summary>
      
      * group
    
      * sink
    
-     {% endcut %}
+     </details>
    
-   * {% cut "storage                    Yandex Object Storage resources" %}
+   * <details><summary>storage                    Yandex Object Storage resources</summary>
      
      * bucket
    
-     {% endcut %}
+     </details>
    
-   * {% cut "backup                     Yandex Cloud Backup resources" %}
+   * <details><summary>backup                     Yandex Cloud Backup resources</summary>
      
      * vm
    
@@ -468,7 +468,7 @@
    
      * policy
    
-     {% endcut %}
+     </details>
    
   7. ### Примеры использования (возможные варианты, ситуации)
    
