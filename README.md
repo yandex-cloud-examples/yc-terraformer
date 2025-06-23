@@ -25,7 +25,8 @@
    
       Скрипт получает при запуске сервис, тип, название и id импортируемого ресурса.
    
-      {% cut "`./yc-terraformer.py -h`" %}
+      <details>
+      <summary>./yc-terraformer.py -h<summary>
       
       ```
       usage: yc-terraformer.py [-h] [--import-metadata] [--import-ids] [--with-state] [--debug] [--recursive] service subitem_type name id
@@ -48,7 +49,7 @@
         --recursive        Включает рекурсивный импорт связанных ресурсов
       ```
    
-      {% endcut %}
+      <details>
    
    , где *`service`* - название сервиса по аналогии с их названием в `yc` (`iam`, `compute`, `managed-postgresql`, `vpс`, `application-load-balancer`, `managed-kubernetes` `etc`), *`subitem_type`* - тип ресурса по аналогии с их названием в `yc` (`service-account`, `instance`, `cluster`, `node-group` `etc`), *`name`* - название ресурса которое будет использовано для *`terraform state`* (во избежание путаницы лучше использовать имя ресурса в облаке), *`id`* - `id` импортируемого ресурса в облаке.
    
