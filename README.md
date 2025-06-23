@@ -49,7 +49,7 @@
         --recursive        Включает рекурсивный импорт связанных ресурсов
       ```
    
-      <details>
+      </details>
    
    , где *`service`* - название сервиса по аналогии с их названием в `yc` (`iam`, `compute`, `managed-postgresql`, `vpс`, `application-load-balancer`, `managed-kubernetes` `etc`), *`subitem_type`* - тип ресурса по аналогии с их названием в `yc` (`service-account`, `instance`, `cluster`, `node-group` `etc`), *`name`* - название ресурса которое будет использовано для *`terraform state`* (во избежание путаницы лучше использовать имя ресурса в облаке), *`id`* - `id` импортируемого ресурса в облаке.
    
