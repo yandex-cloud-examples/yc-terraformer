@@ -26,7 +26,7 @@
       Скрипт получает при запуске сервис, тип, название и id импортируемого ресурса.
    
       <details>
-      <summary>`./yc-terraformer.py -h`</summary>
+      <summary>./yc-terraformer.py -h</summary>
       
       ```
       usage: yc-terraformer.py [-h] [--import-metadata] [--import-ids] [--with-state] [--debug] [--recursive] service subitem_type name id
@@ -79,7 +79,7 @@
    
       По умолчанию все значения `ID` заменяются на переменную с аналогичным именем параметра, чтобы случайно не внести изменения в импортируемые ресурсы. Для указания значений переменных, используемых в файле манифеста, нужно создать файл `variables.tf`, в котором их нужно объявить, и файл `terraform.tfvars`, в котором они будут назначены.
    
-      <details><summary>`variables.tf`</summary>
+      <details><summary>variables.tf</summary>
       
       ```
       #=========== main ==============
@@ -137,7 +137,7 @@
    
       </details>
    
-      <details><summary>`terraform.tfvars`</summary>
+      <details><summary>terraform.tfvars</summary>
       
       ```
       cloud_id  = "b1g5q8h52km0rg0tf67a"
