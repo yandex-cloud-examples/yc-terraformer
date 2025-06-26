@@ -62,14 +62,13 @@ def resource_tfstate_import(subitem_type,subitem_id,subitem_name):
         resource_name(list): массив с именем ресурса в Terraform state
     """
     if service_tf == "storage":
-        import_command = f"terraform import yandex_{service_tf}_{subitem}.{subitem_name} {subitem_name}"
-        manifest = f"resource \"yandex_{service_tf}_{subitem_type}\" \"{subitem_name}\" {{\n\t{subitem}\t= \"{subitem_name}\"\n  }}\n"
+        import_command = f"terraform import yandex_{service_tf}_{subitem_type}.{subitem_name} {subitem_name}"
+        manifest = f"resource \"yandex_{service_tf}_{subitem_type}\" \"{subitem_name}\" {{\n\t{subitem_type}\t= \"{subitem_name}\"\n  }}\n"
         resource_name = [subitem_name]
     else:
         manifest = f"resource \"yandex_{service_tf}_{subitem_type}\" \"{subitem_name}_{id}\" {{\n\tname=\"{subitem_name}\"\n\t}}\n\n"
         import_command = f"terraform import yandex_{service_tf}_{subitem_type}.{subitem_name}_{id} {subitem_id}"
         resource_name = [f'{subitem_name}_{id}']
-
     with open(f"yc_{service_tf}_{subitem_type}_{id}_{subitem_type}.tf","w") as wfile:
         wfile.write(manifest)
     import_result=get_command_output(import_command)
@@ -244,7 +243,7 @@ def convert_attributes_to_terraform(json_data,type_,keys2include,tabscount):
                     terraform_str += f"{tabscount}{key} {{\n{convert_attributes_to_terraform(item,type_,keys2include,f'{tabscount}\t')}{tabscount}}}\n"
             elif isinstance(value, dict):
                 logging.debug(f"convert_attributes_to_terraform: Value is dict: {key} - {value}")
-                if type_ and 'clickhouse' in type_ and key == 'settings':
+                if type_ and 'clickhouse' in type_ and key in ('settings','lifecycle') :
                     terraform_str += f"{tabscount}{key} {{\n{convert_attributes_to_terraform(value,type_,keys2include,f'{tabscount}\t')}{tabscount}}}\n"
                 else:
                     terraform_str += f"{tabscount}{key} = {{\n{convert_attributes_to_terraform(value,type_,keys2include,f'{tabscount}\t')}{tabscount}}}\n"
@@ -488,18 +487,23 @@ def main():
         logging.error("Failed to get API endpoint for service")
         sys.exit(1)
 
+    if not args.import_metadata:
+        remove_metadata = 'metadata'
+    else:
+        remove_metadata = ''
+    
     keys2include = {
 
     }
 
     keys2add = {
-
+        'yandex_mdb_clickhouse_cluster': {
+            '': { 'lifecycle': {
+                    'ignore_changes': ['database', 'user']
+                    }
+                }
+        }
     }
-
-    if not args.import_metadata:
-        remove_metadata = 'metadata'
-    else:
-        remove_metadata = ''
 
     keys2remove = {
         'root': ['created_at', 'id', 'status', 'hardware_generation'],
