@@ -251,8 +251,8 @@ def convert_attributes_to_terraform(json_data,type_,keys2include,tabscount):
                 logging.debug(f"convert_attributes_to_terraform: Value is list of dict: {key} - {value}")
                 terraform_str += f"{tabscount}{key} {{\n"
                 for item in value:
-                    terraform_str += f"{convert_attributes_to_terraform(item,type_,keys2include,f'{tabscount}\t')}"
-                terraform_str += f'{tabscount}}}\n'
+                    terraform_str += convert_attributes_to_terraform(item,type_,keys2include,f'{tabscount}\t')
+                terraform_str += f"{tabscount}}}\n"
             else:
                 logging.debug(f"convert_attributes_to_terraform: Value is str: {key} - {value}")
                 terraform_str += f"{tabscount}{key} = {format_value(value)}\n"
@@ -491,7 +491,7 @@ def main():
         remove_metadata = 'metadata'
     else:
         remove_metadata = ''
-    
+
     keys2include = {
 
     }
@@ -562,7 +562,7 @@ def main():
             '': ['health','host']
         },
         'yandex_mdb_clickhouse_cluster': {
-            '': ['health'],
+            '': ['health','database','user'],
             'host': ['fqdn'],
             'user': ['connection_manager']
         },
